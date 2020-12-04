@@ -1,13 +1,16 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import {
     differenceInDays,
     differenceInHours,
     differenceInWeeks,
 } from 'date-fns';
+
+// Constants
 import { images } from '../constants';
 
-const JobListItem = ({ item }) => {
+const JobListItem = ({ navigation, item }) => {
     const { type, created_at, company, location, title, company_logo } = item;
 
     const formatDate = () => {
@@ -26,8 +29,13 @@ const JobListItem = ({ item }) => {
         }
     };
 
+    const handlePress = () => {
+        // Go to Job Post screen
+        navigation.navigate('Post', { job: item });
+    };
+
     return (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handlePress}>
             <View style={styles.container}>
                 <Image
                     style={styles.logo}
@@ -64,34 +72,40 @@ const styles = StyleSheet.create({
     logo: {
         width: 40,
         height: 40,
-        borderRadius: 10,
+        borderRadius: 8,
         marginTop: 6,
         marginRight: 12,
     },
     center: {
         flex: 4,
+        alignItems: 'flex-start',
     },
     title: {
         color: '#3f5066',
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '700',
         marginBottom: 4,
     },
     subtitle: {
         color: '#96a3b1',
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '400',
         marginBottom: 8,
     },
     jobType: {
         color: '#7c8c9d',
-        fontSize: 14,
-        fontWeight: '600',
+        fontSize: 12,
+        fontWeight: '700',
+        backgroundColor: '#eff2f5',
+        borderRadius: 5,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
     },
     date: {
         flex: 1,
         textAlign: 'right',
         color: '#a5afbb',
+        fontSize: 12,
         fontWeight: '600',
     },
 });

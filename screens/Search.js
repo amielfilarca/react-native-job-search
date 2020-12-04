@@ -1,6 +1,17 @@
 import React, { Component, createRef } from 'react';
-import { Text, StyleSheet, View, FlatList, TextInput } from 'react-native';
+import {
+    Text,
+    StyleSheet,
+    View,
+    FlatList,
+    TextInput,
+    SafeAreaView,
+} from 'react-native';
+
+// Constants
 import { images } from '../constants';
+
+// Components
 import Avatar from '../components/Avatar';
 import MenuIcon from '../components/MenuIcon';
 import FilterButton from '../components/FilterButton';
@@ -17,6 +28,7 @@ export default class Search extends Component {
             searchInput: '',
             jobs: null,
             isLoading: true,
+            modalIsActive: false,
         };
 
         this.searchInputRef = createRef();
@@ -31,9 +43,9 @@ export default class Search extends Component {
         // Fetch jobs from Github Jobs API
         this.setState({ isLoading: true });
         try {
-            let url = 'https://jobs.github.com/positions.json';
+            let url = 'https://jobs.github.com/positions.json?markdown=true';
             if (searchParam) {
-                url = `https://jobs.github.com/positions.json?search=${searchParam}`;
+                url = `https://jobs.github.com/positions.json?markdown=true&search=${searchParam}`;
             }
             const response = await fetch(url);
             const jobs = await response.json();
@@ -45,6 +57,7 @@ export default class Search extends Component {
 
     handleSearchInputChange = async (e) => {
         const searchInput = e.nativeEvent.text.trim();
+        // Prevent fetching data from API when input is only whitespace
         if (searchInput !== '') {
             this.setState({ searchInput }, () => {
                 this.searchInputRef.current.setNativeProps({
@@ -59,6 +72,7 @@ export default class Search extends Component {
     };
 
     clearSearchInput = () => {
+        // Prevent fetching data from API when spamming the clear button
         if (this.state.searchInput !== '') {
             this.setState({ searchInput: '' }, () => {
                 this.searchInputRef.current.clear();
@@ -68,8 +82,8 @@ export default class Search extends Component {
     };
 
     render() {
-        return (
-            <View style={styles.container}>
+        const headerComponent = () => (
+            <>
                 <View style={styles.header}>
                     <MenuIcon />
                     <Avatar source={images.userAvatar} />
@@ -83,6 +97,7 @@ export default class Search extends Component {
                             onEndEditing={this.handleSearchInputChange}
                             style={styles.searchInput}
                             placeholder="Search"
+                            defaultValue={this.state.searchInput}
                         />
                         <ClearIcon clearSearchInput={this.clearSearchInput} />
                     </View>
@@ -96,31 +111,63 @@ export default class Search extends Component {
                             {this.state.searchInput}
                         </Text>
                     )}
-                    {!this.state.searchInput && 'Popular Jobs'}
+                    {!this.state.searchInput && 'Recent Jobs'}
                 </Text>
                 {this.state.isLoading && <Text>Loading...</Text>}
+            </>
+        );
+
+        const emptyComponent = () => (
+            <View style={styles.empty}>
+                {/* Show text only when not loading */}
+                {!this.state.isLoading && (
+                    <Text style={styles.emptyText}>No result.</Text>
+                )}
+            </View>
+        );
+
+        const footerComponent = () => (
+            <View style={styles.footer}>
+                <Text style={styles.footerText}>2020 &copy; Amiel Filarca</Text>
+            </View>
+        );
+
+        const listItemComponent = (item) => {
+            // Pass Navigation to each FlatList item
+            return (
+                <JobListItem item={item} navigation={this.props.navigation} />
+            );
+        };
+
+        return (
+            <SafeAreaView style={styles.container}>
                 <FlatList
+                    style={styles.list}
+                    initialNumToRender={5}
+                    ListHeaderComponent={headerComponent}
+                    ListEmptyComponent={emptyComponent}
+                    ListFooterComponent={footerComponent}
                     data={this.state.jobs}
-                    renderItem={JobListItem}
+                    renderItem={({ item }) => listItemComponent(item)}
                     keyExtractor={(job) => job.id}
                     showsVerticalScrollIndicator={false}
                 />
-            </View>
+            </SafeAreaView>
         );
     }
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 24,
+        flex: 1,
+        paddingHorizontal: 24,
         backgroundColor: 'white',
-        minHeight: '100%',
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: 50,
+        height: 70,
     },
     largeTitle: {
         fontSize: 28,
@@ -146,19 +193,44 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         flex: 1,
+        height: 42,
         paddingVertical: 8,
         paddingHorizontal: 12,
         color: '#41536a',
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '400',
     },
     resultsHeader: {
         marginVertical: 12,
         color: '#44556c',
-        fontWeight: '600',
+        fontWeight: '400',
     },
     searchInputResult: {
         color: '#364860',
+        fontWeight: '700',
+    },
+    list: {
+        flex: 1,
+    },
+    empty: {
+        flex: 1,
+    },
+    emptyText: {
+        textAlign: 'center',
+        color: '#96a3b1',
+        fontSize: 14,
+        fontWeight: '700',
+    },
+    footer: {
+        paddingTop: 12,
+        paddingBottom: 24,
+        alignItems: 'center',
+    },
+    footerText: {
+        marginTop: 24,
+        textTransform: 'uppercase',
+        color: '#7c8c9d',
+        fontSize: 10,
         fontWeight: '700',
     },
 });
