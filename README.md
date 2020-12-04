@@ -1,18 +1,24 @@
 # Job Search
 
+> Powered by [GitHub Jobs API](https://jobs.github.com/api)
+
 ## Project Overview
 
 ### Description
-[WIP] A Job-Search mobile application using GitHub Jobs API.
+A Job-Search mobile application using GitHub Jobs API.
 
 ### Features
-- Search Jobs by title, company, location
-- Filter jobs by company, location, job type
+- Search Jobs from GitHub Jobs API
 
 ### Screenshots
 
-#### Search Page
-![image](https://user-images.githubusercontent.com/46077668/100984339-957f4300-3585-11eb-9ae1-c3e56b76f16f.png)
+#### Search Screen
+
+![Screenshot_1607070784](https://user-images.githubusercontent.com/46077668/101142065-1276ef00-3650-11eb-9480-b3844ed64eac.png)
+
+#### Job Post Screen
+
+![Screenshot_1607070791](https://user-images.githubusercontent.com/46077668/101142067-1440b280-3650-11eb-9398-15fada740ec7.png)
 
 ## Development
 
@@ -21,7 +27,3 @@
 
 ### Tools
 - [date-fns](https://date-fns.org/) for manipulating date objects
-
-## TODO
-- Search filter
-- Job post screen
